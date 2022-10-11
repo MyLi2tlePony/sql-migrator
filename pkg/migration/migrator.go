@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/MyLi2tlePony/sql-migrator/pkg/storage/entity"
-	"github.com/MyLi2tlePony/sql-migrator/pkg/storage/sql"
+	"github.com/MyLi2tlePony/sql-migrator/pkg/storage/postgres"
 )
 
 type Migration interface {

@@ -17,6 +17,7 @@ type Storage interface {
 	Close(context.Context) error
 	InsertMigration(context.Context, entity.Migration) error
 	Migrate(context.Context, string) error
+	DeleteMigrations(context.Context) error
 }
 
 type sqlStorage struct {
@@ -70,6 +71,11 @@ func (storage *sqlStorage) Close(ctx context.Context) error {
 	return storage.conn.Close(ctx)
 }
 
+func (storage *sqlStorage) DeleteMigrations(ctx context.Context) error {
+	_, err := storage.conn.Exec(ctx, "TRUNCATE schema_migrations;")
+	return err
+}
+
 func (storage *sqlStorage) SelectMigrations(ctx context.Context) (migrations []entity.Migration, err error) {
 	sql := `SELECT Name, Status, Version, StatusChangeTime FROM schema_migrations ORDER BY Version DESC;`
 
@@ -80,7 +86,7 @@ func (storage *sqlStorage) SelectMigrations(ctx context.Context) (migrations []e
 
 	defer rows.Close()
 
-	if rows.Next() {
+	for rows.Next() {
 		var (
 			name             string
 			version          int
@@ -94,7 +100,9 @@ func (storage *sqlStorage) SelectMigrations(ctx context.Context) (migrations []e
 		}
 
 		migrations = append(migrations, entity.NewMigration(name, status, version, statusChangeTime))
-	} else {
+	}
+
+	if len(migrations) == 0 {
 		return nil, ErrMigrationNotFound
 	}
 

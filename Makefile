@@ -2,7 +2,11 @@ BIN := ./bin/sql-migrator
 MAIN := ./cmd
 
 test:
-	go test -race ./internal/...
+	go test -race -count 100 ./pkg/...
+	go test -race -count 100 ./internal/...
+
+integration-tests:
+	cd deployments && docker-compose -f docker-compose.test.yaml build && docker-compose -f docker-compose.test.yaml up
 
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.50.0
@@ -34,5 +38,5 @@ status: build
 dbversion: build
 	${BIN} --database "postgresql://postgres:1234512345@localhost:5436/postgres?sslmode=disable" dbversion
 
-.PHONY: test install-lint-deps lint postgres build \
+.PHONY: test integration-tests install-lint-deps lint postgres build \
 		run up down status dbversion

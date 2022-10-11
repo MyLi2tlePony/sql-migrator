@@ -4,9 +4,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
+
 	"github.com/MyLi2tlePony/sql-migrator/internal/app"
 	"github.com/MyLi2tlePony/sql-migrator/internal/logger"
-	"os"
 )
 
 var (
