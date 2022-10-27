@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: postgresdb
+    image: postgres:14.5
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "1234512345"
+    ports:
+      - "5436:5432"
+    networks:
+      - default
+
+  migrator:
+    container_name: migrator
+    build:
+      context: ..
+      dockerfile: ./build/test/Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      - default
+    restart: on-failure
+
+networks:
+  default:
+    driver: bridge
